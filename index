@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Happy Holidays 🎄</title>
+
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    background: radial-gradient(circle at top, #0b2d1a, #020202);
+    font-family: Arial, Helvetica, sans-serif;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+  }
+
+  .container {
+    text-align: center;
+    z-index: 2;
+  }
+
+  .message {
+    font-size: clamp(2.5rem, 8vw, 6rem);
+    font-weight: bold;
+    letter-spacing: 0.2em;
+  }
+
+  .message span {
+    opacity: 0;
+    animation: lights var(--speed) infinite;
+    animation-delay: calc(var(--i) * 0.15s);
+  }
+
+  .button {
+    margin-top: 40px;
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 30px;
+    background: gold;
+    cursor: pointer;
+    box-shadow: 0 0 20px gold;
+  }
+
+  @keyframes lights {
+    0%   { color: red; text-shadow: 0 0 20px red; }
+    25%  { color: gold; text-shadow: 0 0 20px gold; }
+    50%  { color: lime; text-shadow: 0 0 20px lime; }
+    75%  { color: cyan; text-shadow: 0 0 20px cyan; }
+    100% { color: red; text-shadow: 0 0 20px red; }
+  }
+
+  /* 🎆 FIREWORKS */
+  .firework {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: explode 1.2s ease-out forwards;
+  }
+
+  @keyframes explode {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(var(--x), var(--y)) scale(0);
+      opacity: 0;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="message">
+    <span style="--i:0">H</span>
+    <span style="--i:1">A</span>
+    <span style="--i:2">P</span>
+    <span style="--i:3">P</span>
+    <span style="--i:4">Y</span>
+    <br><br>
+    <span style="--i:5">H</span>
+    <span style="--i:6">O</span>
+    <span style="--i:7">L</span>
+    <span style="--i:8">I</span>
+    <span style="--i:9">D</span>
+    <span style="--i:10">A</span>
+    <span style="--i:11">Y</span>
+    <span style="--i:12">S</span>
+  </div>
+
+  <button class="button" onclick="startShow()">🎄 Turn on the Lights</button>
+</div>
+
+<audio id="music" loop>
+  <source src="https://cdn.pixabay.com/audio/2023/11/27/audio_9c1c2a3e6b.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+  let speed = 2;
+
+  function startShow() {
+    document.querySelectorAll('.message span').forEach(span => {
+      span.style.opacity = 1;
+      span.style.setProperty('--speed', speed + 's');
+    });
+
+    document.getElementById('music').play();
+    rhythmEngine();
+    fireworksEngine();
+  }
+
+  // 🎵 Light rhythm engine
+  function rhythmEngine() {
+    setInterval(() => {
+      const burst = Math.random() > 0.6;
+      speed = burst ? (Math.random() * 0.5 + 0.6) : (Math.random() * 1.5 + 1.5);
+
+      document.querySelectorAll('.message span').forEach(span => {
+        span.style.setProperty('--speed', speed + 's');
+      });
+    }, 3000);
+  }
