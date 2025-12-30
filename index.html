@@ -101,19 +101,32 @@
 </div>
 
 <audio id="music" loop>
-  <source src="https://cdn.pixabay.com/audio/2023/11/27/audio_9c1c2a3e6b.mp3" type="audio/mpeg">
+  <source src="deck-the-halls-rock.mp3" type="audio/mpeg">
 </audio>
 
 <script>
   let speed = 2;
 
   function startShow() {
+    const music = document.getElementById('music');
+
     document.querySelectorAll('.message span').forEach(span => {
       span.style.opacity = 1;
       span.style.setProperty('--speed', speed + 's');
     });
 
-    document.getElementById('music').play();
+    music.volume = 0;
+    music.play().then(() => {
+      let v = 0;
+      const fade = setInterval(() => {
+        v += 0.05;
+        music.volume = Math.min(v, 1);
+        if (v >= 1) clearInterval(fade);
+      }, 200);
+    }).catch(e => {
+      console.log('Audio play was prevented:', e);
+    });
+
     rhythmEngine();
     fireworksEngine();
   }
@@ -129,3 +142,38 @@
       });
     }, 3000);
   }
+
+  // 🎆 Fireworks engine
+  function fireworksEngine() {
+    setInterval(() => {
+      if (speed < 1) {
+        launchFirework();
+        launchFirework();
+      } else if (Math.random() > 0.7) {
+        launchFirework();
+      }
+    }, 600);
+  }
+
+  function launchFirework() {
+    const colors = ['red', 'gold', 'lime', 'cyan', 'magenta', 'orange'];
+    const x = Math.random() * window.innerWidth;
+    const y = Math.random() * window.innerHeight * 0.5 + 100;
+
+    for (let i = 0; i < 30; i++) {
+      const spark = document.createElement('div');
+      spark.className = 'firework';
+      spark.style.left = x + 'px';
+      spark.style.top = y + 'px';
+      spark.style.background = colors[Math.floor(Math.random() * colors.length)];
+      spark.style.setProperty('--x', (Math.random() - 0.5) * 300 + 'px');
+      spark.style.setProperty('--y', (Math.random() - 0.5) * 300 + 'px');
+
+      document.body.appendChild(spark);
+      setTimeout(() => spark.remove(), 1200);
+    }
+  }
+</script>
+
+</body>
+</html>
