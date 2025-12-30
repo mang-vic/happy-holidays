@@ -84,6 +84,32 @@
     75% { transform: translate(5px,0); }
     100% { transform: translate(0,0); }
   }
+
+  /* 🎉 Happy New Year message */
+  .newyear {
+    position: fixed;
+    top: 40%;
+    width: 100%;
+    text-align: center;
+    font-size: clamp(3rem, 10vw, 8rem);
+    font-weight: bold;
+    color: gold;
+    text-shadow: 0 0 30px gold;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 5;
+    transition: opacity 2s ease-in-out;
+  }
+
+  /* ✨ Golden blink animation */
+  @keyframes blinkGold {
+    0%, 50%, 100% { color: gold; text-shadow: 0 0 30px gold; }
+    25%, 75% { color: #ffd700; text-shadow: 0 0 50px #ffd700; }
+  }
+
+  .blink {
+    animation: blinkGold 0.8s infinite;
+  }
 </style>
 </head>
 
@@ -109,6 +135,8 @@
 
   <button class="button" onclick="startShow()">🎄 Turn on the Lights</button>
 </div>
+
+<div class="newyear" id="newyear">🎉 Happy New Year! 🎉</div>
 
 <audio id="music" loop>
   <source src="deck-the-halls-rock.mp3" type="audio/mpeg">
@@ -141,7 +169,6 @@ function startShow() {
 
   rhythmEngine();
   startSnow();
-  // Big finale snowstorm after 10s
   finaleTimeout = setTimeout(bigFinale, 10000);
 }
 
@@ -155,7 +182,6 @@ function rhythmEngine() {
       span.style.setProperty('--speed', speed + 's');
     });
 
-    // Screen shake on big beats
     if (burst) {
       const container = document.getElementById('container');
       container.classList.add('shake');
@@ -181,13 +207,20 @@ function createSnowflake() {
   setTimeout(() => snowflake.remove(), 6000);
 }
 
-// ❄️ Big finale snowstorm
+// ❄️ Big finale snowstorm + blinking New Year message
 function bigFinale() {
   const endInterval = setInterval(() => {
     for (let i = 0; i < 10; i++) createSnowflake();
   }, 100);
 
-  setTimeout(() => clearInterval(endInterval), 5000); // finale lasts 5s
+  // Show blinking "Happy New Year" after 2s
+  setTimeout(() => {
+    const newyear = document.getElementById('newyear');
+    newyear.style.opacity = 1;
+    newyear.classList.add('blink');
+  }, 2000);
+
+  setTimeout(() => clearInterval(endInterval), 5000);
 }
 </script>
 
