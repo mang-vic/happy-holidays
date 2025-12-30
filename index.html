@@ -21,6 +21,7 @@
   .container {
     text-align: center;
     z-index: 2;
+    position: relative;
   }
 
   .message {
@@ -54,33 +55,41 @@
     100% { color: red; text-shadow: 0 0 20px red; }
   }
 
-  /* 🎆 FIREWORKS */
-  .firework {
+  /* ❄️ Snow */
+  .snowflake {
     position: fixed;
-    width: 12px;
-    height: 12px;
+    top: -10px;
+    width: 8px;
+    height: 8px;
+    background: white;
     border-radius: 50%;
     pointer-events: none;
-    animation: explode 1.2s ease-out forwards;
-    border: 1px solid white;
+    opacity: 0.8;
+    animation: fall linear forwards;
   }
 
-  @keyframes explode {
-    0% {
-      transform: scale(1);
-      opacity: 1;
-    }
-    100% {
-      transform: translate(var(--x), var(--y)) scale(0);
-      opacity: 0;
-    }
+  @keyframes fall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 0.8; }
+    100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+  }
+
+  .shake {
+    animation: shake 0.2s;
+  }
+
+  @keyframes shake {
+    0% { transform: translate(0,0); }
+    25% { transform: translate(5px,0); }
+    50% { transform: translate(-5px,0); }
+    75% { transform: translate(5px,0); }
+    100% { transform: translate(0,0); }
   }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="container" id="container">
   <div class="message">
     <span style="--i:0">H</span>
     <span style="--i:1">A</span>
@@ -107,8 +116,11 @@
 
 <script>
 let speed = 2;
+let snowInterval;
+let finaleTimeout;
 
 function startShow() {
+  const container = document.getElementById('container');
   const music = document.getElementById('music');
 
   document.querySelectorAll('.message span').forEach(span => {
@@ -116,7 +128,7 @@ function startShow() {
     span.style.setProperty('--speed', speed + 's');
   });
 
-  // Play music after user interaction
+  // Play music with fade-in
   music.volume = 0;
   music.play().then(() => {
     let v = 0;
@@ -125,12 +137,12 @@ function startShow() {
       music.volume = Math.min(v, 1);
       if (v >= 1) clearInterval(fade);
     }, 200);
-  }).catch(e => {
-    console.log('Audio play was prevented:', e);
-  });
+  }).catch(e => console.log('Audio play prevented:', e));
 
   rhythmEngine();
-  fireworksEngine();
+  startSnow();
+  // Big finale snowstorm after 10s
+  finaleTimeout = setTimeout(bigFinale, 10000);
 }
 
 // 🎵 Light rhythm engine
@@ -142,42 +154,40 @@ function rhythmEngine() {
     document.querySelectorAll('.message span').forEach(span => {
       span.style.setProperty('--speed', speed + 's');
     });
+
+    // Screen shake on big beats
+    if (burst) {
+      const container = document.getElementById('container');
+      container.classList.add('shake');
+      setTimeout(() => container.classList.remove('shake'), 200);
+    }
   }, 3000);
 }
 
-// 🎆 Fireworks engine with debug logs
-function fireworksEngine() {
-  setInterval(() => {
-    console.log('fireworksEngine running, speed:', speed);
-    if (speed < 1) {
-      launchFirework();
-      launchFirework();
-    } else if (Math.random() > 0.7) {
-      launchFirework();
-    }
-  }, 600);
+// ❄️ Snow engine
+function startSnow() {
+  snowInterval = setInterval(() => {
+    createSnowflake();
+  }, 150);
 }
 
-function launchFirework() {
-  console.log('launchFirework called');
-  const colors = ['red', 'gold', 'lime', 'cyan', 'magenta', 'orange'];
-  const x = Math.random() * window.innerWidth;
-  const y = Math.random() * window.innerHeight * 0.5 + 100;
+function createSnowflake() {
+  const snowflake = document.createElement('div');
+  snowflake.className = 'snowflake';
+  snowflake.style.left = Math.random() * window.innerWidth + 'px';
+  snowflake.style.animationDuration = (Math.random() * 3 + 3) + 's';
+  snowflake.style.opacity = Math.random() * 0.5 + 0.5;
+  document.body.appendChild(snowflake);
+  setTimeout(() => snowflake.remove(), 6000);
+}
 
-  console.log('Firework launched at', x, y);
+// ❄️ Big finale snowstorm
+function bigFinale() {
+  const endInterval = setInterval(() => {
+    for (let i = 0; i < 10; i++) createSnowflake();
+  }, 100);
 
-  for (let i = 0; i < 30; i++) {
-    const spark = document.createElement('div');
-    spark.className = 'firework';
-    spark.style.left = x + 'px';
-    spark.style.top = y + 'px';
-    spark.style.background = colors[Math.floor(Math.random() * colors.length)];
-    spark.style.setProperty('--x', (Math.random() - 0.5) * 300 + 'px');
-    spark.style.setProperty('--y', (Math.random() - 0.5) * 300 + 'px');
-
-    document.body.appendChild(spark);
-    setTimeout(() => spark.remove(), 1200);
-  }
+  setTimeout(() => clearInterval(endInterval), 5000); // finale lasts 5s
 }
 </script>
 
