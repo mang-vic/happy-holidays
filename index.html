@@ -57,11 +57,12 @@
   /* 🎆 FIREWORKS */
   .firework {
     position: fixed;
-    width: 6px;
-    height: 6px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
     pointer-events: none;
     animation: explode 1.2s ease-out forwards;
+    border: 1px solid white;
   }
 
   @keyframes explode {
@@ -105,74 +106,79 @@
 </audio>
 
 <script>
-  let speed = 2;
+let speed = 2;
 
-  function startShow() {
-    const music = document.getElementById('music');
+function startShow() {
+  const music = document.getElementById('music');
+
+  document.querySelectorAll('.message span').forEach(span => {
+    span.style.opacity = 1;
+    span.style.setProperty('--speed', speed + 's');
+  });
+
+  // Play music after user interaction
+  music.volume = 0;
+  music.play().then(() => {
+    let v = 0;
+    const fade = setInterval(() => {
+      v += 0.05;
+      music.volume = Math.min(v, 1);
+      if (v >= 1) clearInterval(fade);
+    }, 200);
+  }).catch(e => {
+    console.log('Audio play was prevented:', e);
+  });
+
+  rhythmEngine();
+  fireworksEngine();
+}
+
+// 🎵 Light rhythm engine
+function rhythmEngine() {
+  setInterval(() => {
+    const burst = Math.random() > 0.6;
+    speed = burst ? (Math.random() * 0.5 + 0.6) : (Math.random() * 1.5 + 1.5);
 
     document.querySelectorAll('.message span').forEach(span => {
-      span.style.opacity = 1;
       span.style.setProperty('--speed', speed + 's');
     });
+  }, 3000);
+}
 
-    music.volume = 0;
-    music.play().then(() => {
-      let v = 0;
-      const fade = setInterval(() => {
-        v += 0.05;
-        music.volume = Math.min(v, 1);
-        if (v >= 1) clearInterval(fade);
-      }, 200);
-    }).catch(e => {
-      console.log('Audio play was prevented:', e);
-    });
-
-    rhythmEngine();
-    fireworksEngine();
-  }
-
-  // 🎵 Light rhythm engine
-  function rhythmEngine() {
-    setInterval(() => {
-      const burst = Math.random() > 0.6;
-      speed = burst ? (Math.random() * 0.5 + 0.6) : (Math.random() * 1.5 + 1.5);
-
-      document.querySelectorAll('.message span').forEach(span => {
-        span.style.setProperty('--speed', speed + 's');
-      });
-    }, 3000);
-  }
-
-  // 🎆 Fireworks engine
-  function fireworksEngine() {
-    setInterval(() => {
-      if (speed < 1) {
-        launchFirework();
-        launchFirework();
-      } else if (Math.random() > 0.7) {
-        launchFirework();
-      }
-    }, 600);
-  }
-
-  function launchFirework() {
-    const colors = ['red', 'gold', 'lime', 'cyan', 'magenta', 'orange'];
-    const x = Math.random() * window.innerWidth;
-    const y = Math.random() * window.innerHeight * 0.5 + 100;
-
-    for (let i = 0; i < 30; i++) {
-      const spark = document.createElement('div');
-      spark.className = 'firework';
-      spark.style.left = x + 'px';
-      spark.style.top = y + 'px';
-      spark.style.background = colors[Math.floor(Math.random() * colors.length)];
-      spark.style.setProperty('--x', (Math.random() - 0.5) * 300 + 'px');
-      spark.style.setProperty('--y', (Math.random() - 0.5) * 300 + 'px');
-
-      document.body.appendChild(spark);
-      setTimeout(() => spark.remove(), 1200);
+// 🎆 Fireworks engine with debug logs
+function fireworksEngine() {
+  setInterval(() => {
+    console.log('fireworksEngine running, speed:', speed);
+    if (speed < 1) {
+      launchFirework();
+      launchFirework();
+    } else if (Math.random() > 0.7) {
+      launchFirework();
     }
+  }, 600);
+}
+
+function launchFirework() {
+  console.log('launchFirework called');
+  const colors = ['red', 'gold', 'lime', 'cyan', 'magenta', 'orange'];
+  const x = Math.random() * window.innerWidth;
+  const y = Math.random() * window.innerHeight * 0.5 + 100;
+
+  console.log('Firework launched at', x, y);
+
+  for (let i = 0; i < 30; i++) {
+    const spark = document.createElement('div');
+    spark.className = 'firework';
+    spark.style.left = x + 'px';
+    spark.style.top = y + 'px';
+    spark.style.background = colors[Math.floor(Math.random() * colors.length)];
+    spark.style.setProperty('--x', (Math.random() - 0.5) * 300 + 'px');
+    spark.style.setProperty('--y', (Math.random() - 0.5) * 300 + 'px');
+
+    document.body.appendChild(spark);
+    setTimeout(() => spark.remove(), 1200);
   }
+}
 </script>
 
 </body>
